@@ -40,8 +40,8 @@ class Memory_controller extends Module_controller
 						".get_machine_group_filter()."
                         GROUP BY serial_number";
 
-        $queryobj = new Memory_model();
-        $obj->view('json', array('msg' => current(array('msg' => $queryobj->query($sql))))); 
+        $queryobj = new Memory_model;
+        jsonView($queryobj->query($sql));
      }
 
      /**
@@ -59,8 +59,8 @@ class Memory_controller extends Module_controller
 						".get_machine_group_filter('AND')."
 						ORDER BY memorypressure DESC";
 
-        $queryobj = new Memory_model();
-        $obj->view('json', array('msg' => current(array('msg' => $queryobj->query($sql))))); 
+        $queryobj = new Memory_model;
+        jsonView($queryobj->query($sql));
      }
     
 	/**
@@ -76,8 +76,8 @@ class Memory_controller extends Module_controller
                         FROM memory
                         WHERE serial_number = '$serial_number'";
 
-        $queryobj = new Memory_model();
-        $obj->view('json', array('msg' => current(array('msg' => $queryobj->query($sql))))); 
+        $queryobj = new Memory_model;
+        jsonView($queryobj->query($sql));
     }
 
     /**
@@ -92,9 +92,9 @@ class Memory_controller extends Module_controller
         $sql = "SELECT name, dimm_size, dimm_speed, dimm_type, dimm_status, dimm_manufacturer, dimm_part_number, dimm_serial_number, dimm_ecc_errors, global_ecc_state, is_memory_upgradeable
                         FROM memory
                         WHERE serial_number = '$serial_number'";
-
-        $queryobj = new Memory_model();
-        $obj->view('json', array('msg' => current(array('msg' => $queryobj->query($sql))))); 
+        
+        $queryobj = new Memory_model;
+        jsonView($queryobj->query($sql));
     }
     
 } // END class Memory_controller
