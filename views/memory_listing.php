@@ -1,19 +1,10 @@
 <?php $this->view('partials/head'); ?>
 
-<?php //Initialize models needed for the table
-new Machine_model;
-new Reportdata_model;
-new Memory_model;
-?>
-
 <div class="container">
   <div class="row">
 	<div class="col-lg-12">
-
 	  <h3><span data-i18n="memory.reporttitle"></span> <span id="total-count" class='label label-primary'>…</span></h3>
-
 	  <table class="table table-striped table-condensed table-bordered">
-
 		<thead>
 		  <tr>
 			<th data-i18n="listing.computername" data-colname='machine.computer_name'></th>
@@ -33,13 +24,11 @@ new Memory_model;
 			<th data-i18n="memory.pageouts" data-colname='memory.pageouts'></th>
 		  </tr>
 		</thead>
-
 		<tbody>
 		  <tr>
 			<td data-i18n="listing.loading" colspan="15" class="dataTables_empty"></td>
 		  </tr>
 		</tbody>
-
 	  </table>
 	</div> <!-- /span 12 -->
   </div> <!-- /row -->
@@ -48,11 +37,9 @@ new Memory_model;
 <script type="text/javascript">
 
 	$(document).on('appUpdate', function(e){
-
 		var oTable = $('.table').DataTable();
 		oTable.ajax.reload();
 		return;
-
 	});
 
 	$(document).on('appReady', function(e, lang) {
@@ -93,12 +80,6 @@ new Memory_model;
                                 d.columns[index].search.value = '> 0';
                             }
                         });
-
-                    }
-        		    // IDK what this does
-                    if(d.search.value.match(/^\d+\.\d+(\.(\d+)?)?$/)){
-                        var search = d.search.value.split('.').map(function(x){return ('0'+x).slice(-2)}).join('');
-                        d.search.value = search;
                     }
                 }
             },
@@ -113,7 +94,7 @@ new Memory_model;
 	        	var sn=$('td:eq(1)', nRow).html();
 	        	var link = mr.getClientDetailLink(name, sn, '#tab_memory-tab');
 	        	$('td:eq(0)', nRow).html(link);
-                
+
                 // Memory Pressure
                 var memorypressure = $('td:eq(2)', nRow).html();
                 if (memorypressure != "" && (memorypressure)) {
@@ -121,7 +102,7 @@ new Memory_model;
                 } else {
                     $('td:eq(2)', nRow).html('');
                 }
-                
+
 	        	// ECC Status
 	        	var eccstatus=$('td:eq(3)', nRow).html();
 	        	eccstatus = eccstatus == '2' ? i18n.t('memory.ecc_errors') :
@@ -134,7 +115,7 @@ new Memory_model;
 	        	upgradable = upgradable == '1' ? i18n.t('yes') :
 	        	(upgradable === '0' ? i18n.t('no') : '')
 	        	$('td:eq(4)', nRow).html(upgradable)
-                
+
 	        	// Format free
 	        	var colvar = $('td:eq(5)', nRow).html();
                 if (colvar != "" && (colvar)) {
@@ -142,7 +123,7 @@ new Memory_model;
                 } else {
                     $('td:eq(5)', nRow).html('');
                 }
-                
+
                 // Format active
 	        	var colvar = $('td:eq(6)', nRow).html();
                 if (colvar != "" && (colvar)) {
@@ -150,7 +131,7 @@ new Memory_model;
                 } else {
                     $('td:eq(6)', nRow).html('');
                 }
-                
+
                 // Format inactive
 	        	var colvar = $('td:eq(7)', nRow).html();
                 if (colvar != "" && (colvar)) {
@@ -166,7 +147,7 @@ new Memory_model;
                 } else {
                     $('td:eq(8)', nRow).html('');
                 }
-                
+
                 // Format swapfree
 	        	var colvar = $('td:eq(9)', nRow).html();
                 if (colvar != "" && (colvar)) {
@@ -174,7 +155,7 @@ new Memory_model;
                 } else {
                     $('td:eq(9)', nRow).html('');
                 }
-                
+
                 // Format swapused
 	        	var colvar = $('td:eq(10)', nRow).html();
                 if (colvar != "" && (colvar)) {
@@ -182,7 +163,7 @@ new Memory_model;
                 } else {
                     $('td:eq(10)', nRow).html('');
                 }
-                
+
                 // Format swaptotal
 	        	var colvar = $('td:eq(11)', nRow).html();
                 if (colvar != "" && (colvar)) {
@@ -190,7 +171,7 @@ new Memory_model;
                 } else {
                     $('td:eq(11)', nRow).html('');
                 }
-                
+
 	        	// Swap Encrypted
 	        	var swapencrypted=$('td:eq(12)', nRow).html();
 	        	swapencrypted = swapencrypted == '1' ? i18n.t('yes') :

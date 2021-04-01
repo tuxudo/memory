@@ -1,19 +1,10 @@
 <?php $this->view('partials/head'); ?>
 
-<?php //Initialize models needed for the table
-new Machine_model;
-new Reportdata_model;
-new Memory_model;
-?>
-
 <div class="container">
   <div class="row">
 	<div class="col-lg-12">
-
 	  <h3><span data-i18n="memory.reporttitle_ram"></span> <span id="total-count" class='label label-primary'>…</span></h3>
-
 	  <table class="table table-striped table-condensed table-bordered">
-
 		<thead>
 		  <tr>
 			<th data-i18n="listing.computername" data-colname='machine.computer_name'></th>
@@ -27,13 +18,11 @@ new Memory_model;
 			<th data-i18n="memory.dimm_ecc_errors" data-colname='memory.dimm_ecc_errors'></th>
 		  </tr>
 		</thead>
-
 		<tbody>
 		  <tr>
 			<td data-i18n="listing.loading" colspan="9" class="dataTables_empty"></td>
 		  </tr>
 		</tbody>
-
 	  </table>
 	</div> <!-- /span 12 -->
   </div> <!-- /row -->
@@ -42,11 +31,9 @@ new Memory_model;
 <script type="text/javascript">
 
 	$(document).on('appUpdate', function(e){
-
 		var oTable = $('.table').DataTable();
 		oTable.ajax.reload();
 		return;
-
 	});
 
 	$(document).on('appReady', function(e, lang) {
@@ -87,12 +74,6 @@ new Memory_model;
                                 d.columns[index].search.value = '> 0';
                             }
                         });
-
-                    }
-        		    // IDK what this does
-                    if(d.search.value.match(/^\d+\.\d+(\.(\d+)?)?$/)){
-                        var search = d.search.value.split('.').map(function(x){return ('0'+x).slice(-2)}).join('');
-                        d.search.value = search;
                     }
                 }
             },

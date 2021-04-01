@@ -9,7 +9,7 @@ $(document).on('appReady', function(){
         var memorycapacity = 0
 
 		$.each(data, function(i,d){
-			
+
 			// Generate rows from data
 			var rows = ''
 			var inforows = ''

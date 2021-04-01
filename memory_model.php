@@ -48,14 +48,11 @@ class Memory_model extends \Model {
 		$this->rs['swapfree'] = 0;
 		$this->rs['swapencrypted'] = 0; // true/false
 
-		// Schema version, increment when creating a db migration
-		$this->schema_version = 2;
-        
 		$this->serial_number = $serial;
 	}
 	
 	// ------------------------------------------------------------------------
-    
+
 	/**
 	 * Process data sent by postflight
 	 *
@@ -64,7 +61,7 @@ class Memory_model extends \Model {
 	 **/
 	function process($plist)
 	{
-		
+
 		if ( ! $plist){
 			throw new Exception("Error Processing Request: No property list found", 1);
 		}
@@ -75,20 +72,8 @@ class Memory_model extends \Model {
 		$parser = new CFPropertyList();
 		$parser->parse($plist, CFPropertyList::FORMAT_XML);
 		$myList = $parser->toArray();
-        		
-		$typeList = array(
-			'name' => '',
-			'dimm_size' => '',
-			'dimm_speed' => '',
-			'dimm_type' => '',
-			'dimm_status' => '',
-			'dimm_manufacturer' => '',
-			'dimm_part_number' => '',
-			'dimm_serial_number' => '',
-			'dimm_ecc_errors' => ''
-        );
-        
-		
+
+		// Process each entry
         foreach ($myList as $memstick) {
                         
             // Check if we have a name
@@ -121,17 +106,16 @@ class Memory_model extends \Model {
                 $memstick['dimm_manufacturer'] = str_replace(array('0x029E','0x014F','0x802C','0x830B','0x80AD','0x02FE','0x0000','0x8394','0x0D9B','0x2C00','0x80CE','0xAD00','0xCE00','0x5105','0x8551','0x0198','0x859b','0x859B'), array('Corsair (0x029E)','Transcend Information (0x014F)','Micron Technology (0x802C)','Nanya (0x830B)','Hynix Semiconductor (0x80AD)','Elpida Memory (0x02FE)','TransIntl (0x0000)','Mushkin (0x8394)','Crucial (0x0D9B)','Micron Technology (0x2C00)','Samsung Electronics (0x80CE)','Hynix Semiconductor (0xAD00)','Samsung Electronics (0xCE00)','Qimonda AG (0x5105)','Qimonda AG (0x8551)','Kingston (0x0198)',' Crucial (0x859b)',' Crucial (0x859B)'),$memstick['dimm_manufacturer']);
                 $memstick['dimm_manufacturer'] = str_replace(array("000000000000","FE0000000000"),array("",""),$memstick['dimm_manufacturer']);
 			}
-
             
-			foreach ($typeList as $key => $value) {
+            // Process each key
+			foreach ($this->rs as $key => $value) {
 				$this->rs[$key] = $value;
 				if(array_key_exists($key, $memstick))
 				{
 					$this->rs[$key] = $memstick[$key];
 				}
 			}
-            
-            
+
             // Remove space after DIMM
             $this->rs['name'] = str_replace("DIMM ","DIMM",$this->rs['name']);
             // The improve readability of bank name
