@@ -1,22 +1,14 @@
 <div class="col-lg-4 col-md-6">
-
 	<div class="panel panel-default" id="upgradable-memory-widget">
-
 		<div class="panel-heading" data-container="body">
-
 			<h3 class="panel-title"><i class="fa fa-microchip"></i>
 			    <span data-i18n="memory.is_memory_upgradeable"></span>
 			    <list-link data-url="/show/listing/memory/memory"></list-link>
 			</h3>
-
 		</div>
-
 		<div class="panel-body text-center"></div>
-
 	</div><!-- /panel -->
-
 </div><!-- /col -->
-
 
 <script>
 $(document).on('appUpdate', function(e, lang) {
@@ -24,7 +16,6 @@ $(document).on('appUpdate', function(e, lang) {
     $.getJSON( appUrl + '/module/memory/memory_upgradable_widget', function( data ) {
 
     	if(data.error){
-    		//alert(data.error);
     		return;
     	}
 

@@ -131,11 +131,15 @@ def memory_upgradeable(array):
 
 def ecc_state(array):
 
-    if array[0]['global_ecc_state'] == 'ecc_enabled' :
-        return 1
-    elif array[0]['global_ecc_state'] == 'ecc_errors' :
-        return 2
-    else:
+    try:
+        if array[0]['global_ecc_state'] == 'ecc_enabled' :
+            return 1
+        elif array[0]['global_ecc_state'] == 'ecc_errors' :
+            return 2
+        else:
+            return 0
+
+    except Exception:
         return 0
 
 def flatten_memory_info(array, is_memory_upgradeable, global_ecc_state):
@@ -185,16 +189,6 @@ def remove_all(substr, str):
     
 def main():
     """Main"""
-    # Create cache dir if it does not exist
-    cachedir = '%s/cache' % os.path.dirname(os.path.realpath(__file__))
-    if not os.path.exists(cachedir):
-        os.makedirs(cachedir)
-
-    # Skip manual check
-    if len(sys.argv) > 1:
-        if sys.argv[1] == 'manualcheck':
-            print 'Manual check: skipping'
-            exit(0)
 
     # Get results
     result = dict()
@@ -202,14 +196,14 @@ def main():
     is_memory_upgradeable = memory_upgradeable(info)
     global_ecc_state = ecc_state(info)
     result = flatten_memory_info(info, is_memory_upgradeable, global_ecc_state)
-    
+
     del result[-1]
-    
+
     # Write memory results to cache
+    cachedir = '%s/cache' % os.path.dirname(os.path.realpath(__file__))
     output_plist = os.path.join(cachedir, 'memoryinfo.plist')
     plistlib.writePlist(result, output_plist)
     #print plistlib.writePlistToString(result)
-
 
 if __name__ == "__main__":
     main()
