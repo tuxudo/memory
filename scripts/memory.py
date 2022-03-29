@@ -1,4 +1,4 @@
-#!/usr/local/munkireport/munkireport-python2
+#!/usr/local/munki/munki-python
 
 import subprocess
 import os
@@ -15,7 +15,10 @@ def get_memory_info():
                             stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     (output, unused_error) = proc.communicate()
     try:
-        plist = plistlib.readPlistFromString(output)
+        try:
+            plist = plistlib.readPlistFromString(output)
+        except AttributeError as e:
+            plist = plistlib.loads(output)
         # system_profiler xml is an array
         sp_dict = plist[0]
         items = sp_dict['_items']
@@ -32,7 +35,7 @@ def get_memory_data():
 
     meminfo = get_memory_pressure()
     
-    for item in output.split("\n"):
+    for item in output.decode().split("\n"):
         if "Pages free:" in item:
             meminfo['free'] = int(re.sub('[^0-9]','', (item)).strip())*4096
         elif "Pages active:" in item:
@@ -92,7 +95,7 @@ def get_memory_pressure():
                                 stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         (output, unused_error) = proc.communicate()
 
-        for item in output.split("\n"):
+        for item in output.decode().split("\n"):
             if "System-wide memory free percentage" in item:
                 pressure['memorypressure'] = 100-int(re.sub('[^0-9]','', (item)).strip())
 
@@ -108,7 +111,7 @@ def get_swap_data():
 
     swap = {'swapencrypted': 0}
 
-    for item in output.split("  "):
+    for item in output.decode().split("  "):
         if "total = " in item:
             swap['swaptotal'] = int(re.sub('[^0-9]','', (item)).strip())*10000
         elif "used = " in item:
@@ -202,7 +205,11 @@ def main():
     # Write memory results to cache
     cachedir = '%s/cache' % os.path.dirname(os.path.realpath(__file__))
     output_plist = os.path.join(cachedir, 'memoryinfo.plist')
-    plistlib.writePlist(result, output_plist)
+    try:
+        plistlib.writePlist(result, output_plist)
+    except:
+        with open(output_plist, 'wb') as fp:
+            plistlib.dump(result, fp, fmt=plistlib.FMT_XML)
     #print plistlib.writePlistToString(result)
 
 if __name__ == "__main__":
