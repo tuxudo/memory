@@ -9,7 +9,13 @@ import re
 
 def get_memory_info():
     '''Uses system profiler to get memory info for this machine.'''
-    cmd = ['/usr/sbin/system_profiler', 'SPMemoryDataType', '-xml']
+    # Apple Silicon Macs running Python 2 through Rosetta 2 mis-report this data
+    # Check if we're on an Apple Silicon Mac and force it to run system_profiler as Apple Silicon
+    if "arm64" in get_cpuarch():
+        cmd = ["/usr/bin/arch", "-arm64", "/usr/sbin/system_profiler", "SPMemoryDataType", "-xml"]
+    else:
+        cmd = ["/usr/sbin/system_profiler", "SPMemoryDataType", "-xml"]
+
     proc = subprocess.Popen(cmd, shell=False, bufsize=-1,
                             stdin=subprocess.PIPE,
                             stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -97,8 +103,7 @@ def get_memory_pressure():
                 pressure['memorypressure'] = 100-int(re.sub('[^0-9]','', (item)).strip())
 
     return pressure
-    
-        
+
 def get_swap_data():
     cmd = ['/usr/sbin/sysctl', 'vm.swapusage']
     proc = subprocess.Popen(cmd, shell=False, bufsize=-1,
@@ -118,11 +123,13 @@ def get_swap_data():
         elif "(encrypted)" in item:
             swap['swapencrypted'] = 1
     return swap
-    
-def memory_upgradeable(array):
 
-    if 'is_memory_upgradeable' in array[0]:
-        if array[0]['is_memory_upgradeable'] == 'No' :
+def memory_upgradeable(array):
+    
+    if "arm64" in get_cpuarch():
+        return 0
+    elif 'is_memory_upgradeable' in array[0]:
+        if array[0]['is_memory_upgradeable'] == 'No':
             return 0
         else:
             return 1
@@ -175,9 +182,35 @@ def flatten_memory_info(array, is_memory_upgradeable, global_ecc_state):
                 device['dimm_type'] = obj[item]
             elif item == 'dimm_ecc_errors':
                 device['dimm_ecc_errors'] = obj[item]
+            elif item == 'SPMemoryDataType':
+                device['dimm_size'] = obj[item]
+
+        if "arm64" in get_cpuarch():
+            device['name'] = get_cpuinfo()+" Memory"
 
         out.append(device)
     return out
+
+def get_cpuarch():
+    try:
+        arch_output = subprocess.check_output(["/usr/bin/arch", "-arm64", "/usr/bin/uname", "-m"], stderr=subprocess.STDOUT)
+    except subprocess.CalledProcessError:
+        arch_output = subprocess.check_output(["/usr/bin/uname", "-m"])
+    return arch_output.decode("utf-8").strip()
+
+def get_cpuinfo():
+    cmd = ["/usr/sbin/sysctl", "-n", "machdep.cpu.brand_string"]
+    proc = subprocess.Popen(
+        cmd,
+        shell=False,
+        bufsize=-1,
+        stdin=subprocess.PIPE,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+    )
+    (output, unused_error) = proc.communicate()
+    output = output.strip()
+    return output.decode("utf-8")
 
 def remove_all(substr, str):
     index = 0
@@ -197,13 +230,14 @@ def main():
     global_ecc_state = ecc_state(info)
     result = flatten_memory_info(info, is_memory_upgradeable, global_ecc_state)
 
-    del result[-1]
+    if "arm64" not in get_cpuarch():
+        del result[-1]
 
     # Write memory results to cache
     cachedir = '%s/cache' % os.path.dirname(os.path.realpath(__file__))
     output_plist = os.path.join(cachedir, 'memoryinfo.plist')
     plistlib.writePlist(result, output_plist)
-    #print plistlib.writePlistToString(result)
+    # print plistlib.writePlistToString(result)
 
 if __name__ == "__main__":
     main()
