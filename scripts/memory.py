@@ -9,7 +9,13 @@ import re
 
 def get_memory_info():
     '''Uses system profiler to get memory info for this machine.'''
-    cmd = ['/usr/sbin/system_profiler', 'SPMemoryDataType', '-xml']
+    # Apple Silicon Macs running Python 2 through Rosetta 2 mis-report this data
+    # Check if we're on an Apple Silicon Mac and force it to run system_profiler as Apple Silicon
+    if "arm64" in get_cpuarch():
+        cmd = ["/usr/bin/arch", "-arm64", "/usr/sbin/system_profiler", "SPMemoryDataType", "-xml"]
+    else:
+        cmd = ["/usr/sbin/system_profiler", "SPMemoryDataType", "-xml"]
+
     proc = subprocess.Popen(cmd, shell=False, bufsize=-1,
                             stdin=subprocess.PIPE,
                             stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -100,8 +106,7 @@ def get_memory_pressure():
                 pressure['memorypressure'] = 100-int(re.sub('[^0-9]','', (item)).strip())
 
     return pressure
-    
-        
+
 def get_swap_data():
     cmd = ['/usr/sbin/sysctl', 'vm.swapusage']
     proc = subprocess.Popen(cmd, shell=False, bufsize=-1,
@@ -121,8 +126,6 @@ def get_swap_data():
         elif "(encrypted)" in item:
             swap['swapencrypted'] = 1
     return swap
-    
-def memory_upgradeable(array):
 
     if "arm" in os.uname()[3].lower():
         return 0
@@ -227,6 +230,7 @@ def main():
     # Write memory results to cache
     cachedir = '%s/cache' % os.path.dirname(os.path.realpath(__file__))
     output_plist = os.path.join(cachedir, 'memoryinfo.plist')
+    
     try:
         plistlib.writePlist(result, output_plist)
     except:
