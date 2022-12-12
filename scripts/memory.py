@@ -124,8 +124,10 @@ def get_swap_data():
     
 def memory_upgradeable(array):
 
-    if 'is_memory_upgradeable' in array[0]:
-        if array[0]['is_memory_upgradeable'] == 'No' :
+    if "arm" in os.uname()[3].lower():
+        return 0
+    elif 'is_memory_upgradeable' in array[0]:
+        if array[0]['is_memory_upgradeable'] == 'No':
             return 0
         else:
             return 1
@@ -178,9 +180,28 @@ def flatten_memory_info(array, is_memory_upgradeable, global_ecc_state):
                 device['dimm_type'] = obj[item]
             elif item == 'dimm_ecc_errors':
                 device['dimm_ecc_errors'] = obj[item]
+            elif item == 'SPMemoryDataType':
+                device['dimm_size'] = obj[item]
+
+        if "arm" in os.uname()[3].lower():
+            device['name'] = get_cpuinfo()+" Memory"
 
         out.append(device)
     return out
+
+def get_cpuinfo():
+    cmd = ["/usr/sbin/sysctl", "-n", "machdep.cpu.brand_string"]
+    proc = subprocess.Popen(
+        cmd,
+        shell=False,
+        bufsize=-1,
+        stdin=subprocess.PIPE,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+    )
+    (output, unused_error) = proc.communicate()
+    output = output.strip()
+    return output.decode("utf-8")
 
 def remove_all(substr, str):
     index = 0
@@ -200,7 +221,8 @@ def main():
     global_ecc_state = ecc_state(info)
     result = flatten_memory_info(info, is_memory_upgradeable, global_ecc_state)
 
-    del result[-1]
+    if "arm" not in os.uname()[3].lower():
+        del result[-1]
 
     # Write memory results to cache
     cachedir = '%s/cache' % os.path.dirname(os.path.realpath(__file__))
