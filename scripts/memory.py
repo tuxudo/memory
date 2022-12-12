@@ -1,4 +1,4 @@
-#!/usr/local/munkireport/munkireport-python2
+#!/usr/local/munkireport/munkireport-python3
 
 import subprocess
 import os
@@ -21,7 +21,10 @@ def get_memory_info():
                             stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     (output, unused_error) = proc.communicate()
     try:
-        plist = plistlib.readPlistFromString(output)
+        try:
+            plist = plistlib.readPlistFromString(output)
+        except AttributeError as e:
+            plist = plistlib.loads(output)
         # system_profiler xml is an array
         sp_dict = plist[0]
         items = sp_dict['_items']
@@ -38,7 +41,7 @@ def get_memory_data():
 
     meminfo = get_memory_pressure()
     
-    for item in output.split("\n"):
+    for item in output.decode().split("\n"):
         if "Pages free:" in item:
             meminfo['free'] = int(re.sub('[^0-9]','', (item)).strip())*4096
         elif "Pages active:" in item:
@@ -98,7 +101,7 @@ def get_memory_pressure():
                                 stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         (output, unused_error) = proc.communicate()
 
-        for item in output.split("\n"):
+        for item in output.decode().split("\n"):
             if "System-wide memory free percentage" in item:
                 pressure['memorypressure'] = 100-int(re.sub('[^0-9]','', (item)).strip())
 
@@ -113,7 +116,7 @@ def get_swap_data():
 
     swap = {'swapencrypted': 0}
 
-    for item in output.split("  "):
+    for item in output.decode().split("  "):
         if "total = " in item:
             swap['swaptotal'] = int(re.sub('[^0-9]','', (item)).strip())*10000
         elif "used = " in item:
@@ -124,9 +127,7 @@ def get_swap_data():
             swap['swapencrypted'] = 1
     return swap
 
-def memory_upgradeable(array):
-    
-    if "arm64" in get_cpuarch():
+    if "arm" in os.uname()[3].lower():
         return 0
     elif 'is_memory_upgradeable' in array[0]:
         if array[0]['is_memory_upgradeable'] == 'No':
@@ -185,18 +186,11 @@ def flatten_memory_info(array, is_memory_upgradeable, global_ecc_state):
             elif item == 'SPMemoryDataType':
                 device['dimm_size'] = obj[item]
 
-        if "arm64" in get_cpuarch():
+        if "arm" in os.uname()[3].lower():
             device['name'] = get_cpuinfo()+" Memory"
 
         out.append(device)
     return out
-
-def get_cpuarch():
-    try:
-        arch_output = subprocess.check_output(["/usr/bin/arch", "-arm64", "/usr/bin/uname", "-m"], stderr=subprocess.STDOUT)
-    except subprocess.CalledProcessError:
-        arch_output = subprocess.check_output(["/usr/bin/uname", "-m"])
-    return arch_output.decode("utf-8").strip()
 
 def get_cpuinfo():
     cmd = ["/usr/sbin/sysctl", "-n", "machdep.cpu.brand_string"]
@@ -230,14 +224,19 @@ def main():
     global_ecc_state = ecc_state(info)
     result = flatten_memory_info(info, is_memory_upgradeable, global_ecc_state)
 
-    if "arm64" not in get_cpuarch():
+    if "arm" not in os.uname()[3].lower():
         del result[-1]
 
     # Write memory results to cache
     cachedir = '%s/cache' % os.path.dirname(os.path.realpath(__file__))
     output_plist = os.path.join(cachedir, 'memoryinfo.plist')
-    plistlib.writePlist(result, output_plist)
-    # print plistlib.writePlistToString(result)
+    
+    try:
+        plistlib.writePlist(result, output_plist)
+    except:
+        with open(output_plist, 'wb') as fp:
+            plistlib.dump(result, fp, fmt=plistlib.FMT_XML)
+    #print plistlib.writePlistToString(result)
 
 if __name__ == "__main__":
     main()
