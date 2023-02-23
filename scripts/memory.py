@@ -9,13 +9,7 @@ import re
 
 def get_memory_info():
     '''Uses system profiler to get memory info for this machine.'''
-    # Apple Silicon Macs running Python 2 through Rosetta 2 mis-report this data
-    # Check if we're on an Apple Silicon Mac and force it to run system_profiler as Apple Silicon
-    if "arm64" in get_cpuarch():
-        cmd = ["/usr/bin/arch", "-arm64", "/usr/sbin/system_profiler", "SPMemoryDataType", "-xml"]
-    else:
-        cmd = ["/usr/sbin/system_profiler", "SPMemoryDataType", "-xml"]
-
+    cmd = ["/usr/sbin/system_profiler", "SPMemoryDataType", "-xml"]
     proc = subprocess.Popen(cmd, shell=False, bufsize=-1,
                             stdin=subprocess.PIPE,
                             stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -127,6 +121,18 @@ def get_swap_data():
             swap['swapencrypted'] = 1
     return swap
 
+    if "arm" in os.uname()[3].lower():
+        return 0
+    elif 'is_memory_upgradeable' in array[0]:
+        if array[0]['is_memory_upgradeable'] == 'No':
+            return 0
+        else:
+            return 1
+    else:
+            return 1
+
+def memory_upgradeable(array):
+    
     if "arm" in os.uname()[3].lower():
         return 0
     elif 'is_memory_upgradeable' in array[0]:
