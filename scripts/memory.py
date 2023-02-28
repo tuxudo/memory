@@ -211,14 +211,6 @@ def get_cpuinfo():
     (output, unused_error) = proc.communicate()
     output = output.strip()
     return output.decode("utf-8")
-
-def remove_all(substr, str):
-    index = 0
-    length = len(substr)
-    while string.find(str, substr) != -1:
-        index = string.find(str, substr)
-        str = str[0:index] + str[index+length:]
-    return str
     
 def main():
     """Main"""
