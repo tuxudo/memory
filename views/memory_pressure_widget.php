@@ -1,13 +1,12 @@
 <div class="col-lg-4 col-md-6">
-	<div class="panel panel-default" id="memory-pressure-widget">
-		<div class="panel-heading" data-container="body" >
-			<h3 class="panel-title"><i class="fa fa-area-chart"></i>
-			    <span data-i18n="memory.memorypressure"></span>
-			    <list-link data-url="/show/listing/memory/memory"></list-link>
-			</h3>
+	<div class="card" id="memory-pressure-widget">
+		<div class="card-heading" data-container="body" >
+			><i class="fa fa-area-chart"></i>
+		    <span data-i18n="memory.memorypressure"></span>
+		    <a href="/show/listing/memory/memory" class="pull-right"><i class="fa fa-list"></i></a>
 		</div>
 		<div class="list-group scroll-box"></div>
-	</div><!-- /panel -->
+	</div><!-- /card -->
 </div><!-- /col -->
 
 <script>

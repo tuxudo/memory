@@ -1,13 +1,12 @@
 <div class="col-lg-4 col-md-6">
-	<div class="panel panel-default" id="upgradable-memory-widget">
-		<div class="panel-heading" data-container="body">
-			<h3 class="panel-title"><i class="fa fa-microchip"></i>
-			    <span data-i18n="memory.is_memory_upgradeable"></span>
-			    <list-link data-url="/show/listing/memory/memory"></list-link>
-			</h3>
+	<div class="card" id="upgradable-memory-widget">
+		<div class="card-heading" data-container="body">
+			<i class="fa fa-microchip"></i>
+		    <span data-i18n="memory.is_memory_upgradeable"></span>
+		    <a href="/show/listing/memory/memory" class="pull-right"><i class="fa fa-list"></i></a>
 		</div>
-		<div class="panel-body text-center"></div>
-	</div><!-- /panel -->
+		<div class="card-body text-center"></div>
+	</div><!-- /card -->
 </div><!-- /col -->
 
 <script>
@@ -19,9 +18,9 @@ $(document).on('appUpdate', function(e, lang) {
     		return;
     	}
 
-		var panel = $('#upgradable-memory-widget div.panel-body'),
+		var card = $('#upgradable-memory-widget div.card-body'),
 			baseUrl = appUrl + '/show/listing/memory/memory';
-		panel.empty();
+		card.empty();
 
         var widupgradable = 0
         var widnotupgradable = 0
@@ -41,11 +40,11 @@ $(document).on('appUpdate', function(e, lang) {
 
         // Only display block if widupgradable is not zero
         if(widupgradable != "0"){
-			panel.append('<a href="'+baseUrl+'#is_memory_upgradeable" class="btn btn-info"><span class="bigger-150">'+widupgradable+'</span><br>'+i18n.t('memory.upgradable')+'</a>');
+			card.append('<a href="'+baseUrl+'#is_memory_upgradeable" class="btn btn-info"><span class="bigger-150">'+widupgradable+'</span><br>'+i18n.t('memory.upgradable')+'</a>');
 		}
         // Only display block if widnotupgradable is not zero
 		if(widnotupgradable != "0"){
-			panel.append(' <a href="'+baseUrl+'" class="btn btn-info"><span class="bigger-150">'+widnotupgradable+'</span><br>'+i18n.t('memory.notupgradable')+'</a>');
+			card.append(' <a href="'+baseUrl+'" class="btn btn-info"><span class="bigger-150">'+widnotupgradable+'</span><br>'+i18n.t('memory.notupgradable')+'</a>');
 		}
 
     });
