@@ -1,6 +1,6 @@
 <div class="col-lg-4 col-md-6">
 	<div class="card" id="upgradable-memory-widget">
-		<div class="card-heading" data-container="body">
+		<div class="card-header" data-container="body">
 			<i class="fa fa-microchip"></i>
 		    <span data-i18n="memory.is_memory_upgradeable"></span>
 		    <a href="/show/listing/memory/memory" class="pull-right"><i class="fa fa-list"></i></a>
