@@ -70,7 +70,7 @@ class Memory_controller extends Module_controller
     public function get_memory_data($serial_number = '')
     {
         // Remove non-serial number characters
-        $serial_number = preg_replace("/[^A-Za-z0-9_\-]]/", '', $serial_number);
+        $serial_number = preg_replace("/[^A-Za-z0-9_\-]/", '', $serial_number);
 
         $sql = "SELECT memorypressure, free, active, inactive, wireddown, speculative, throttled, purgeable, reactivated, filebacked, anonymous, storedincompressor, occupiedbycompressor, swapfree, swapused, swaptotal,swapins, swapouts, pageins, pageouts, swapencrypted
                         FROM memory
@@ -87,7 +87,7 @@ class Memory_controller extends Module_controller
     public function get_ram_data($serial_number = '')
     {
         // Remove non-serial number characters
-        $serial_number = preg_replace("/[^A-Za-z0-9_\-]]/", '', $serial_number);
+        $serial_number = preg_replace("/[^A-Za-z0-9_\-]/", '', $serial_number);
 
         $sql = "SELECT name, dimm_size, dimm_speed, dimm_type, dimm_status, dimm_manufacturer, dimm_part_number, dimm_serial_number, dimm_ecc_errors, global_ecc_state, is_memory_upgradeable
                         FROM memory
